@@ -3,11 +3,6 @@ import { HashingService } from 'src/utils/hashing.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UsersRepository } from './users.repository';
 
-interface UpdatePermissions {
-  id: string;
-  permission: string;
-}
-
 @Injectable()
 export class UsersService {
   constructor(
@@ -21,6 +16,7 @@ export class UsersService {
     return this.usersRepository.create({
       email: user.email,
       password: hasedPassword,
+      phoneNumber: user.phoneNumber,
     });
   }
 

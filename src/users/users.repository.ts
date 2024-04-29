@@ -33,11 +33,12 @@ export class UsersRepository {
   }
 
   async create(user: CreateUserDto) {
-    const { email, password } = user;
+    const { email, password, phoneNumber } = user;
     const createUser = this.usersRepository.create({
       id: v4(),
       email,
       password,
+      phoneNumber,
     });
     await this.usersRepository.save(createUser);
   }
