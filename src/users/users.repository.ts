@@ -33,9 +33,10 @@ export class UsersRepository {
   }
 
   async create(user: CreateUserDto) {
-    const { email, password, phoneNumber } = user;
+    const { nickname, email, password, phoneNumber } = user;
     const createUser = this.usersRepository.create({
       id: v4(),
+      nickname,
       email,
       password,
       phoneNumber,

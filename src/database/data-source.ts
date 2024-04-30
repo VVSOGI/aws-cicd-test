@@ -1,16 +1,25 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+
 import { config } from 'dotenv';
 import { Board } from 'src/boards/entities/boards.entity';
-import { Mig1707118760019 } from 'src/database/migration/1707118760019-mig';
 import { User } from 'src/users/entities/user.entity';
 import { DataSource } from 'typeorm';
-import { Mig1707120783808 } from './migration/1707120783808-mig';
-import { Mig1714385888250 } from './migration/1714385888250-mig';
+import * as fs from 'fs';
+import * as path from 'path';
 
 config({
   path: __dirname + '/../../.env',
 });
 
-const migrations = [Mig1707118760019, Mig1707120783808, Mig1714385888250];
+const migrationDirectory = path.join(__dirname, 'migration');
+const migrationFiles = fs
+  .readdirSync(migrationDirectory)
+  .filter((file) => file.endsWith('.js'));
+
+const migrations = migrationFiles.map((file) => {
+  const requiredModule = require(path.join(migrationDirectory, file));
+  return requiredModule[Object.keys(requiredModule)[0]];
+});
 
 export const dataSource = new DataSource({
   type: 'postgres',

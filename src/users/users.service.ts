@@ -14,6 +14,7 @@ export class UsersService {
     const hasedPassword = await this.hashingService.hashPassword(user.password);
     await this.usersRepository.isUserExist(user.email);
     return this.usersRepository.create({
+      nickname: user.nickname,
       email: user.email,
       password: hasedPassword,
       phoneNumber: user.phoneNumber,
