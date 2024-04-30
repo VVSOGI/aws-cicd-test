@@ -19,18 +19,18 @@ export class AuthService {
       user.password,
     );
     if (!isMatch) {
-      throw new UnauthorizedException('Password not match');
+      throw new UnauthorizedException('Incorrect password');
     }
   }
 
   private async generateToken(user: User) {
     const accessToken = await this.jwtService.signAsync(
       { id: user.id, email: user.email },
-      { expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRATION_TIME },
+      { expiresIn: `${process.env.JWT_ACCESS_TOKEN_EXPIRATION_TIME}s` },
     );
     const refreshToken = await this.jwtService.signAsync(
       { id: user.id, email: user.email },
-      { expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRATION_TIME },
+      { expiresIn: `${process.env.JWT_REFRESH_TOKEN_EXPIRATION_TIME}s` },
     );
     return { accessToken, refreshToken };
   }

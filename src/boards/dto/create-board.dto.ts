@@ -1,5 +1,4 @@
-import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { Priority } from '../type/types';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateBoardDto {
   @IsString()
@@ -9,11 +8,4 @@ export class CreateBoardDto {
   @IsString()
   @IsNotEmpty()
   description: string;
-
-  @IsString()
-  @IsNotEmpty()
-  commitUrl: string;
-
-  @IsEnum(Priority)
-  priority: Priority;
 }

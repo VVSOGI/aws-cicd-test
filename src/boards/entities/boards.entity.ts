@@ -8,32 +8,11 @@ import {
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Priority } from '../type/types';
 
 @Entity()
 export class Board {
   @PrimaryColumn({ type: 'uuid' })
   id: string;
-
-  @Column({ type: 'varchar', length: 255 })
-  title: string;
-
-  @Column({ type: 'varchar' })
-  description: string;
-
-  @Column({ type: 'varchar', length: 255 })
-  commitUrl: string;
-
-  @Column({
-    type: 'enum',
-    enum: Priority,
-    default: Priority.LOW,
-    nullable: false,
-  })
-  priority: Priority;
-
-  @Column({ type: 'varchar', length: 255 })
-  email: string;
 
   @ManyToOne(() => User, (user) => user.boards)
   @JoinColumn({ name: 'userId' })
@@ -41,6 +20,21 @@ export class Board {
 
   @Column({ type: 'varchar', length: 255 })
   userId: string;
+
+  @Column({ type: 'varchar', length: 255 })
+  title: string;
+
+  @Column({ type: 'varchar', length: 255 })
+  email: string;
+
+  @Column({ type: 'varchar' })
+  description: string;
+
+  @Column({ type: 'int', default: 0 })
+  likeNumber: number;
+
+  @Column({ type: 'varchar', length: 255 })
+  imagePath: string; // 이미지 경로를 저장하기 위해 추가
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

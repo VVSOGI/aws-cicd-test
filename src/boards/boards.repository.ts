@@ -7,7 +7,11 @@ import { Board } from './entities/boards.entity';
 import { GetBoards } from './type/types';
 
 interface CreateBoard extends CreateBoardDto {
+  userId: string;
   email: string;
+  title: string;
+  description: string;
+  imagePath: string;
 }
 
 @Injectable()
@@ -18,6 +22,7 @@ export class BoardsRepository {
 
   async create(createBoard: CreateBoard) {
     const id = v4();
+    console.log(createBoard);
     const board = this.boardsRepository.create({ id, ...createBoard });
 
     return await this.boardsRepository.save(board);
