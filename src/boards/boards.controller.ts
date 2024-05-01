@@ -15,6 +15,7 @@ import { BoardsService } from './boards.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
+import { v4 } from 'uuid';
 
 @Controller('boards')
 export class BoardsController {
@@ -28,8 +29,14 @@ export class BoardsController {
     @Body() createBoardDto: CreateBoardDto,
     @Request() req,
   ) {
-    const imagePath = '/uploads/' + file.filename;
     const userId = req.user.id;
+    const imageId = v4();
+    const filenames = file.originalname.split('.');
+    const extension = filenames[filenames.length - 1];
+    const imagePath = `uploads/${userId}/${imageId}.${extension}`;
+
+    await this.boardsService.uploadImageToS3(imagePath, file.buffer);
+
     const board = await this.boardsService.createBoard({
       ...createBoardDto,
       userId,
@@ -39,12 +46,12 @@ export class BoardsController {
   }
 
   @Get()
-  getAllBoards(@Query('page') page = 1) {
+  async getAllBoards(@Query('page') page = 1) {
     if (page <= 0) {
       throw new BadRequestException('Invalid page');
     }
 
-    return this.boardsService.getAllBoards({ page });
+    return await this.boardsService.getAllBoards({ page });
   }
 
   @Get('/:id')

@@ -34,7 +34,16 @@ export class Board {
   likeNumber: number;
 
   @Column({ type: 'varchar', length: 255 })
-  imagePath: string; // 이미지 경로를 저장하기 위해 추가
+  imagePath: string;
+
+  @Column({ type: 'text', array: true })
+  activityDate: string[];
+
+  @Column({ type: 'text', array: true })
+  activityTime: string[];
+
+  @Column({ type: 'varchar' })
+  address: string;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

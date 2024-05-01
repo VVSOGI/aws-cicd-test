@@ -8,4 +8,8 @@ export class CreateBoardDto {
   @IsString()
   @IsNotEmpty()
   description: string;
+
+  @IsString()
+  @IsNotEmpty()
+  address: string;
 }
