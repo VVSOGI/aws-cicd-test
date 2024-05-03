@@ -64,9 +64,9 @@ export class AuthService {
     const user = await this.usersRepository.findUserById(id);
     const accessToken = await this.jwtService.signAsync(
       { id: user.id, email: user.email },
-      { expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRATION_TIME },
+      { expiresIn: `${process.env.JWT_REFRESH_TOKEN_EXPIRATION_TIME}s` },
     );
 
-    return accessToken;
+    return { accessToken };
   }
 }
