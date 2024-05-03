@@ -31,12 +31,21 @@ export class BoardsController {
   ) {
     const userId = req.user.id;
     const imageId = v4();
-    const filenames = file.originalname.split('.');
-    const extension = filenames[filenames.length - 1];
-    const imagePath = `uploads/${userId}/${imageId}.${extension}`;
+    if (file) {
+      const filenames = file.originalname.split('.');
+      const extension = filenames[filenames.length - 1];
+      const imagePath = `uploads/${userId}/${imageId}.${extension}`;
 
-    await this.boardsService.uploadImageToS3(imagePath, file.buffer);
+      await this.boardsService.uploadImageToS3(imagePath, file.buffer);
+      const board = await this.boardsService.createBoard({
+        ...createBoardDto,
+        userId,
+        imagePath,
+      });
+      return board;
+    }
 
+    const imagePath = '';
     const board = await this.boardsService.createBoard({
       ...createBoardDto,
       userId,

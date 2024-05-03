@@ -12,4 +12,12 @@ export class CreateBoardDto {
   @IsString()
   @IsNotEmpty()
   address: string;
+
+  @IsString({ each: true })
+  @IsNotEmpty()
+  activityDate: string[];
+
+  @IsString({ each: true })
+  @IsNotEmpty()
+  activityTime: string[];
 }
