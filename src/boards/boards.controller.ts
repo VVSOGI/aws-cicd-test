@@ -63,6 +63,11 @@ export class BoardsController {
     return await this.boardsService.getAllBoards({ page });
   }
 
+  @Get('search')
+  async searchAddress(@Query('keyword') keyword: string) {
+    return await this.boardsService.searchAddress(keyword);
+  }
+
   @Get('/:id')
   getBoardById(@Param('id') id: string) {
     return this.boardsService.getBoardById(id);

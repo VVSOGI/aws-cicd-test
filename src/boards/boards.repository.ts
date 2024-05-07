@@ -55,4 +55,11 @@ export class BoardsRepository {
     }
     return board;
   }
+
+  async searchAddress(keyword: string) {
+    return await this.boardsRepository
+      .createQueryBuilder('board')
+      .where('board.address LIKE :keyword', { keyword: `%${keyword}%` })
+      .getMany();
+  }
 }

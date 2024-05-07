@@ -31,7 +31,8 @@ import { MulterModule } from '@nestjs/platform-express';
           entities: [__dirname + '/**/*.entity{.js,.ts}'],
           database: configService.get('DB_DATABASE'),
           synchronize: false,
-          logging: true,
+          logging:
+            configService.get('NODE_ENV') === 'development' ? true : false,
         };
       },
     }),

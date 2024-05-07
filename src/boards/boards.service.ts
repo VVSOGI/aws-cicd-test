@@ -63,7 +63,43 @@ export class BoardsService {
     return { data: addImageBoards, total };
   }
 
-  getBoardById(id: string) {
-    return this.boardsRepository.getBoardById(id);
+  async getBoardById(id: string) {
+    const board = await this.boardsRepository.getBoardById(id);
+    const profile = await this.authService.profile(board.userId);
+    const image = process.env.AWS_S3_URL + board.imagePath;
+
+    if (!board.imagePath) {
+      return {
+        data: {
+          ...board,
+          nickname: profile.nickname,
+        },
+      };
+    }
+
+    return {
+      data: {
+        ...board,
+        nickname: profile.nickname,
+        image: image,
+      },
+    };
+  }
+
+  async searchAddress(keyword: string) {
+    const data = await this.boardsRepository.searchAddress(keyword);
+    const addImageBoards = data.map((board) => {
+      if (!board.imagePath) {
+        return board;
+      }
+      const image = process.env.AWS_S3_URL + board.imagePath;
+      return {
+        ...board,
+        image: image,
+      };
+    });
+    return {
+      data: addImageBoards,
+    };
   }
 }

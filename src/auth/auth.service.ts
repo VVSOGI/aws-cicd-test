@@ -47,6 +47,7 @@ export class AuthService {
     const findUser = await this.usersRepository.findUserById(id);
     return {
       id: findUser.id,
+      nickname: findUser.nickname,
       email: findUser.email,
       permission: findUser.permission,
     };
