@@ -14,7 +14,6 @@ import {
 import { AuthService } from './auth.service';
 import { LoginUserDto } from './dto/login-user.dto';
 import { JwtAuthGuard } from './guards/jwt.guard';
-import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
@@ -40,7 +39,7 @@ export class AuthController {
 
   @Get('google/callback')
   async googleAuthRedirect(@Req() req, @Res() res) {
-    const { id, code } = req.query;
+    const { code } = req.query;
 
     // console.log(code, 213);
     const response = await fetch('https://oauth2.googleapis.com/token', {
@@ -55,7 +54,6 @@ export class AuthController {
     });
 
     const { id_token, access_token } = await response.json();
-    console.log(access_token);
 
     const getProfiles = await fetch(
       `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${access_token}`,
