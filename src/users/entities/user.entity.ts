@@ -12,13 +12,13 @@ export class User {
   @Column({ type: 'varchar', length: 40, unique: true })
   email: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', nullable: true })
   password: string;
 
   @Column({ type: 'varchar', default: 'user' })
   permission: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', nullable: true })
   phoneNumber: string;
 
   @OneToMany(() => Board, (board) => board.user)

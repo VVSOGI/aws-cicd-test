@@ -10,6 +10,10 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
 import { UpdatePermissions } from './types/types';
 
+interface CreateGoogleUserDto extends CreateUserDto {
+  id: string;
+}
+
 @Injectable()
 export class UsersRepository {
   constructor(
@@ -36,6 +40,17 @@ export class UsersRepository {
     const { nickname, email, password, phoneNumber } = user;
     const createUser = this.usersRepository.create({
       id: v4(),
+      nickname,
+      email,
+      password,
+      phoneNumber,
+    });
+    await this.usersRepository.save(createUser);
+  }
+  async googleAuthCreate(user: CreateGoogleUserDto) {
+    const { id, nickname, email, password, phoneNumber } = user;
+    const createUser = this.usersRepository.create({
+      id,
       nickname,
       email,
       password,
