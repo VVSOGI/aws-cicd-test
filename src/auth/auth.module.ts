@@ -8,6 +8,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersRepository } from 'src/users/users.repository';
+import { GoogleStrategy } from './strategies/google.strategy';
+import { OAuth2Client } from 'google-auth-library';
 
 @Module({
   imports: [
@@ -22,7 +24,23 @@ import { UsersRepository } from 'src/users/users.repository';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, HashingService, JwtStrategy, UsersRepository],
+  providers: [
+    AuthService,
+    HashingService,
+    JwtStrategy,
+    GoogleStrategy,
+    UsersRepository,
+    {
+      provide: OAuth2Client,
+      useFactory: () => {
+        return new OAuth2Client(
+          process.env.GOOGLE_CLIENT_ID,
+          process.env.GOOGLE_CLIENT_SECRET,
+          'http://localhost:4000/auth/google/callback',
+        );
+      },
+    },
+  ],
   exports: [AuthService],
 })
 export class AuthModule {}

@@ -4,6 +4,8 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { HashingService } from 'src/utils/hashing.service';
 import { User } from '../users/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
+import { OAuth2Client } from 'google-auth-library';
+import { GoogleProfile } from './types';
 
 @Injectable()
 export class AuthService {
@@ -11,6 +13,7 @@ export class AuthService {
     private usersRepository: UsersRepository,
     private hashingService: HashingService,
     private jwtService: JwtService,
+    private readonly oauth2Client: OAuth2Client,
   ) {}
 
   private async checkPassword(user: User, password: string) {
@@ -69,5 +72,33 @@ export class AuthService {
     );
 
     return { accessToken };
+  }
+
+  async getGoogleLoginUrl(): Promise<string> {
+    const googleLoginUrl = this.oauth2Client.generateAuthUrl({
+      access_type: 'offline',
+      scope: ['profile', 'email'],
+      prompt: 'consent',
+    });
+    console.log(googleLoginUrl);
+    return googleLoginUrl;
+  }
+
+  async createGoogleUser(profile: GoogleProfile) {
+    const { id, email, name } = profile;
+
+    try {
+      await this.usersRepository.findUserById(id);
+      return;
+    } catch (error) {
+      console.log(error);
+      await this.usersRepository.googleAuthCreate({
+        id,
+        email,
+        nickname: name,
+        password: null,
+        phoneNumber: null,
+      });
+    }
   }
 }
