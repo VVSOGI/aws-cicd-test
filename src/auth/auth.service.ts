@@ -1,10 +1,9 @@
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersRepository } from '../users/users.repository';
 import { LoginUserDto } from './dto/login-user.dto';
 import { HashingService } from 'src/utils/hashing.service';
 import { User } from '../users/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
-import { GoogleProfile } from './types';
 
 @Injectable()
 export class AuthService {
@@ -78,22 +77,27 @@ export class AuthService {
     return googleLoginUrl;
   }
 
-  async createGoogleUser(profile: GoogleProfile) {
-    const { id, email, name, picture } = profile;
+  async getGoogleToken(code: string) {
+    const response = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      body: JSON.stringify({
+        code,
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET,
+        redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+        grant_type: 'authorization_code',
+      }),
+    });
 
-    try {
-      await this.usersRepository.findUserById(id);
-      return;
-    } catch (error) {
-      Logger.log(`[AuthService] log in createGoogleUser: ${error.message}`);
-      await this.usersRepository.googleAuthCreate({
-        id,
-        email,
-        nickname: name,
-        password: null,
-        phoneNumber: null,
-        profileImage: picture,
-      });
-    }
+    const token = await response.json();
+    return token;
+  }
+
+  async getGoogleProfile(accessToken: string) {
+    const getProfiles = await fetch(
+      `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${accessToken}`,
+    );
+    const profile = await getProfiles.json();
+    return profile;
   }
 }

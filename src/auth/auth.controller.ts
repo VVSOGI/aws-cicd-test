@@ -14,10 +14,14 @@ import {
 import { AuthService } from './auth.service';
 import { LoginUserDto } from './dto/login-user.dto';
 import { JwtAuthGuard } from './guards/jwt.guard';
+import { UsersService } from 'src/users/users.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly usersService: UsersService,
+  ) {}
 
   @Post('login')
   login(@Body() loginUserDto: LoginUserDto) {
@@ -40,30 +44,13 @@ export class AuthController {
   @Get('google/callback')
   async googleAuthRedirect(@Req() req, @Res() res) {
     const { code } = req.query;
-
-    const response = await fetch('https://oauth2.googleapis.com/token', {
-      method: 'POST',
-      body: JSON.stringify({
-        code,
-        client_id: process.env.GOOGLE_CLIENT_ID,
-        client_secret: process.env.GOOGLE_CLIENT_SECRET,
-        redirect_uri: process.env.GOOGLE_REDIRECT_URI,
-        grant_type: 'authorization_code',
-      }),
-    });
-
-    const { id_token, access_token } = await response.json();
-
-    const getProfiles = await fetch(
-      `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${access_token}`,
-    );
-    const profile = await getProfiles.json();
-
     try {
-      await this.authService.createGoogleUser(profile);
-      res.cookie('accessToken', id_token, {
-        httpOnly: true,
-      });
+      const token = await this.authService.getGoogleToken(code);
+      const { id_token, access_token } = token;
+      const profile = await this.authService.getGoogleProfile(access_token);
+      await this.usersService.createGoogleUser(profile);
+
+      res.cookie('accessToken', id_token, { httpOnly: true });
       res.redirect(process.env.FRONTEND_URL);
     } catch (error) {
       Logger.error(
