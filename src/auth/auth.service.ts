@@ -50,7 +50,8 @@ export class AuthService {
       id: findUser.id,
       nickname: findUser.nickname,
       email: findUser.email,
-      permission: findUser.permission,
+      phoneNumber: findUser.phoneNumber,
+      profileImage: findUser.profileImage,
     };
   }
 
@@ -78,7 +79,7 @@ export class AuthService {
   }
 
   async createGoogleUser(profile: GoogleProfile) {
-    const { id, email, name } = profile;
+    const { id, email, name, picture } = profile;
 
     try {
       await this.usersRepository.findUserById(id);
@@ -91,6 +92,7 @@ export class AuthService {
         nickname: name,
         password: null,
         phoneNumber: null,
+        profileImage: picture,
       });
     }
   }
