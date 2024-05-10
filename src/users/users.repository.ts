@@ -3,12 +3,11 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { v4 } from 'uuid';
-import { CreateUserDto } from './dto/create-user.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { CreateGoogleUser, CreateUser, UpdatePermissions } from './types/types';
 import { User } from './entities/user.entity';
-import { CreateGoogleUser, UpdatePermissions } from './types/types';
+import { v4 } from 'uuid';
 
 @Injectable()
 export class UsersRepository {
@@ -32,7 +31,7 @@ export class UsersRepository {
     return user;
   }
 
-  async create(user: CreateUserDto) {
+  async create(user: CreateUser) {
     const { nickname, email, password, phoneNumber } = user;
     const createUser = this.usersRepository.create({
       id: v4(),
