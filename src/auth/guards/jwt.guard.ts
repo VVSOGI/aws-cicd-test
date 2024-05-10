@@ -1,6 +1,7 @@
 import {
   ExecutionContext,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -17,7 +18,6 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    console.log(context, 'context');
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
 
@@ -44,6 +44,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       const jwtPayload = await this.jwtService.verifyAsync(token);
       return jwtPayload;
     } catch (error) {
+      Logger.error(`Error validating token: ${error.message}`);
       const ticket = await this.googleClient.verifyIdToken({
         idToken: token,
         audience: process.env.GOOGLE_CLIENT_ID,
