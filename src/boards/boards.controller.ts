@@ -12,10 +12,9 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { BoardsService } from './boards.service';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateBoardDto } from './dto/create-board.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
-import { v4 } from 'uuid';
 
 @Controller('boards')
 export class BoardsController {
@@ -30,22 +29,7 @@ export class BoardsController {
     @Request() req,
   ) {
     const userId = req.user.id;
-    const imageId = v4();
-    if (file) {
-      const filenames = file.originalname.split('.');
-      const extension = filenames[filenames.length - 1];
-      const imagePath = `uploads/${userId}/${imageId}.${extension}`;
-
-      await this.boardsService.uploadImageToS3(imagePath, file.buffer);
-      const board = await this.boardsService.createBoard({
-        ...createBoardDto,
-        userId,
-        imagePath,
-      });
-      return board;
-    }
-
-    const imagePath = '';
+    const imagePath = await this.boardsService.uploadImage(file, userId);
     const board = await this.boardsService.createBoard({
       ...createBoardDto,
       userId,

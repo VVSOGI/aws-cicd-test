@@ -1,14 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { BoardsRepository } from './boards.repository';
-import { GetBoards } from './type/types';
-import { CreateBoardDto } from './dto/create-board.dto';
 import { AuthService } from 'src/auth/auth.service';
+import { CreateBoard, GetBoards } from './type/types';
 import { s3 } from 'src/common/aws/s3';
-
-interface CreateBoard extends CreateBoardDto {
-  userId: string;
-  imagePath: string;
-}
+import { v4 } from 'uuid';
 
 @Injectable()
 export class BoardsService {
@@ -16,34 +11,23 @@ export class BoardsService {
     private boardsRepository: BoardsRepository,
     private authService: AuthService,
   ) {}
-
-  async uploadImageToS3(imagePath: string, imageBuffer: Buffer) {
-    const params = {
-      Bucket: process.env.AWS_S3_BUCKET,
-      Key: imagePath,
-      Body: imageBuffer,
-    };
-
-    await s3.upload(params).promise();
-  }
-
   /**
    * 프론트 측에서 element가 하나인 activityDate, activityTime를 보낼 때,
    * 문자열 타입으로 들어오는데 이를 프론트에서 해결할 수 없어서 서버에서 처리함
    * */
-  async createBoard(createBoardDto: CreateBoard) {
-    const user = await this.authService.profile(createBoardDto.userId);
+  async createBoard(createBoard: CreateBoard) {
+    const user = await this.authService.profile(createBoard.userId);
 
-    if (!Array.isArray(createBoardDto.activityDate)) {
-      createBoardDto.activityDate = [createBoardDto.activityDate];
+    if (!Array.isArray(createBoard.activityDate)) {
+      createBoard.activityDate = [createBoard.activityDate];
     }
 
-    if (!Array.isArray(createBoardDto.activityTime)) {
-      createBoardDto.activityTime = [createBoardDto.activityTime];
+    if (!Array.isArray(createBoard.activityTime)) {
+      createBoard.activityTime = [createBoard.activityTime];
     }
 
     this.boardsRepository.create({
-      ...createBoardDto,
+      ...createBoard,
       email: user.email,
     });
   }
@@ -84,6 +68,31 @@ export class BoardsService {
         image: image,
       },
     };
+  }
+
+  private async uploadImageToS3(imagePath: string, imageBuffer: Buffer) {
+    const params = {
+      Bucket: process.env.AWS_S3_BUCKET,
+      Key: imagePath,
+      Body: imageBuffer,
+    };
+
+    await s3.upload(params).promise();
+  }
+
+  async uploadImage(
+    file: Express.Multer.File,
+    userId: string,
+  ): Promise<string> {
+    if (!file) {
+      return '';
+    }
+    const imageId = v4();
+    const filenames = file.originalname.split('.');
+    const extension = filenames[filenames.length - 1];
+    const imagePath = `uploads/${userId}/${imageId}.${extension}`;
+    await this.uploadImageToS3(imagePath, file.buffer);
+    return imagePath;
   }
 
   async searchAddress(keyword: string) {

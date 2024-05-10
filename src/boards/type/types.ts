@@ -1,15 +1,11 @@
-export enum Priority {
-  HIGH = 'high',
-  LOW = 'low',
-}
-
 export interface CreateBoard {
-  email: string;
   userId: string;
+  imagePath: string;
   title: string;
   description: string;
-  commitUrl: string;
-  priority: Priority;
+  address: string;
+  activityDate: string[];
+  activityTime: string[];
 }
 
 export interface GetBoards {
