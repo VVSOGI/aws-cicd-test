@@ -41,14 +41,13 @@ export class AuthController {
   async googleAuthRedirect(@Req() req, @Res() res) {
     const { code } = req.query;
 
-    // console.log(code, 213);
     const response = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
       body: JSON.stringify({
         code,
         client_id: process.env.GOOGLE_CLIENT_ID,
         client_secret: process.env.GOOGLE_CLIENT_SECRET,
-        redirect_uri: 'http://localhost:4000/auth/google/callback',
+        redirect_uri: process.env.GOOGLE_REDIRECT_URI,
         grant_type: 'authorization_code',
       }),
     });
@@ -59,6 +58,7 @@ export class AuthController {
       `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${access_token}`,
     );
     const profile = await getProfiles.json();
+
     try {
       await this.authService.createGoogleUser(profile);
       res.cookie('accessToken', id_token, {
@@ -69,7 +69,7 @@ export class AuthController {
       Logger.error(
         `[AuthController] Error in googleAuthRedirect: ${error.message}`,
       );
-      // res.redirect(process.env.FRONTEND_URL);
+      res.redirect(process.env.FRONTEND_URL);
     }
   }
 

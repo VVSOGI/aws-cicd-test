@@ -17,6 +17,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    console.log(context, 'context');
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
 

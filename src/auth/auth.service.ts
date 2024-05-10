@@ -1,10 +1,9 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { UsersRepository } from '../users/users.repository';
 import { LoginUserDto } from './dto/login-user.dto';
 import { HashingService } from 'src/utils/hashing.service';
 import { User } from '../users/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
-import { OAuth2Client } from 'google-auth-library';
 import { GoogleProfile } from './types';
 
 @Injectable()
@@ -13,7 +12,6 @@ export class AuthService {
     private usersRepository: UsersRepository,
     private hashingService: HashingService,
     private jwtService: JwtService,
-    private readonly oauth2Client: OAuth2Client,
   ) {}
 
   private async checkPassword(user: User, password: string) {
@@ -75,12 +73,7 @@ export class AuthService {
   }
 
   async getGoogleLoginUrl(): Promise<string> {
-    const googleLoginUrl = this.oauth2Client.generateAuthUrl({
-      access_type: 'offline',
-      scope: ['profile', 'email'],
-      prompt: 'consent',
-    });
-    console.log(googleLoginUrl);
+    const googleLoginUrl = `https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&scope=profile email&prompt=consent&response_type=code&client_id=${process.env.GOOGLE_CLIENT_ID}&redirect_uri=${process.env.GOOGLE_REDIRECT_URI}`;
     return googleLoginUrl;
   }
 
@@ -91,7 +84,7 @@ export class AuthService {
       await this.usersRepository.findUserById(id);
       return;
     } catch (error) {
-      console.log(error);
+      Logger.log(`[AuthService] log in createGoogleUser: ${error.message}`);
       await this.usersRepository.googleAuthCreate({
         id,
         email,
