@@ -21,6 +21,12 @@ export class User {
   @Column({ type: 'varchar', nullable: true })
   phoneNumber: string;
 
+  @Column({
+    type: 'varchar',
+    nullable: true,
+  })
+  profileImage: string;
+
   @OneToMany(() => Board, (board) => board.user)
   boards: Board[];
 }

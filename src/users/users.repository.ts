@@ -8,11 +8,7 @@ import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
-import { UpdatePermissions } from './types/types';
-
-interface CreateGoogleUserDto extends CreateUserDto {
-  id: string;
-}
+import { CreateGoogleUser, UpdatePermissions } from './types/types';
 
 @Injectable()
 export class UsersRepository {
@@ -44,17 +40,20 @@ export class UsersRepository {
       email,
       password,
       phoneNumber,
+      profileImage: process.env.AWS_S3_PROFILE_URL,
     });
     await this.usersRepository.save(createUser);
   }
-  async googleAuthCreate(user: CreateGoogleUserDto) {
-    const { id, nickname, email, password, phoneNumber } = user;
+
+  async googleAuthCreate(user: CreateGoogleUser) {
+    const { id, nickname, email, password, phoneNumber, profileImage } = user;
     const createUser = this.usersRepository.create({
       id,
       nickname,
       email,
       password,
       phoneNumber,
+      profileImage,
     });
     await this.usersRepository.save(createUser);
   }
