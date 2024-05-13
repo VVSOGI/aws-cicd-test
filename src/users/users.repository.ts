@@ -39,7 +39,7 @@ export class UsersRepository {
       email,
       password,
       phoneNumber,
-      profileImage: process.env.AWS_S3_PROFILE_URL,
+      profileImage: process.env.AWS_CLOUD_FRONT_PROFILE_URL,
     });
     await this.usersRepository.save(createUser);
   }
