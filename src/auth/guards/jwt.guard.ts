@@ -41,10 +41,12 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
   private async validateToken(token: string): Promise<any> {
     try {
-      const jwtPayload = await this.jwtService.verifyAsync(token);
+      const jwtPayload = await this.jwtService.verifyAsync(token, {
+        secret: process.env.JWT_SECRET_KEY,
+      });
       return jwtPayload;
     } catch (error) {
-      Logger.error(`Error validating token: ${error.message}`);
+      Logger.log(`Error validating token: ${error.message}`);
       const ticket = await this.googleClient.verifyIdToken({
         idToken: token,
         audience: process.env.GOOGLE_CLIENT_ID,
