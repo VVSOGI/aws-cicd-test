@@ -43,13 +43,25 @@ export class BoardsService {
     await s3.upload(params).promise();
   }
 
+  async uploadImage(
+    file: Express.Multer.File,
+    userId: string,
+    boardId: string,
+  ): Promise<string> {
+    if (!file) return '';
+    const imageId = v4();
+    const filenames = file.originalname.split('.');
+    const extension = filenames[filenames.length - 1];
+    const imagePath = `uploads/${userId}/${boardId}/${imageId}.${extension}`;
+    await this.uploadImageToS3(imagePath, file.buffer);
+    return imagePath;
+  }
+
   /**
    * 프론트 측에서 element가 하나인 activityDate, activityTime를 보낼 때,
    * 문자열 타입으로 들어오는데 이를 프론트에서 해결할 수 없어서 서버에서 처리함
    * */
   async createBoard(createBoard: CreateBoard) {
-    const user = await this.authService.profile(createBoard.userId);
-
     if (!Array.isArray(createBoard.activityDate)) {
       createBoard.activityDate = [createBoard.activityDate];
     }
@@ -60,7 +72,6 @@ export class BoardsService {
 
     this.boardsRepository.create({
       ...createBoard,
-      email: user.email,
     });
   }
 
@@ -83,17 +94,9 @@ export class BoardsService {
     };
   }
 
-  async uploadImage(
-    file: Express.Multer.File,
-    userId: string,
-  ): Promise<string> {
-    if (!file) return '';
-    const imageId = v4();
-    const filenames = file.originalname.split('.');
-    const extension = filenames[filenames.length - 1];
-    const imagePath = `uploads/${userId}/${imageId}.${extension}`;
-    await this.uploadImageToS3(imagePath, file.buffer);
-    return imagePath;
+  async isOwnedBoard(boardId: string, userId: string) {
+    const board = await this.boardsRepository.getBoardById(boardId);
+    return board.userId === userId;
   }
 
   async searchAddress(keyword: string) {
@@ -107,5 +110,22 @@ export class BoardsService {
     return {
       data: boards,
     };
+  }
+
+  async deleteBoard(boardId: string, userId: string) {
+    const isOwnedBoard = await this.isOwnedBoard(boardId, userId);
+    if (!isOwnedBoard) {
+      throw new Error('Not owned board');
+    }
+    await this.boardsRepository.deleteBoard(boardId);
+  }
+
+  async deleteS3Image(imagePath: string) {
+    const params = {
+      Bucket: process.env.AWS_S3_BUCKET,
+      Key: imagePath,
+    };
+
+    await s3.deleteObject(params).promise();
   }
 }

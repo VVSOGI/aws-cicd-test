@@ -1,18 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { v4 } from 'uuid';
-import { CreateBoardDto } from './dto/create-board.dto';
 import { Board } from './entities/boards.entity';
-import { GetBoards } from './type/types';
-
-interface CreateBoard extends CreateBoardDto {
-  userId: string;
-  email: string;
-  title: string;
-  description: string;
-  imagePath: string;
-}
+import { CreateBoard, GetBoards } from './type/types';
 
 @Injectable()
 export class BoardsRepository {
@@ -21,8 +11,7 @@ export class BoardsRepository {
   ) {}
 
   async create(createBoard: CreateBoard) {
-    const id = v4();
-    const board = this.boardsRepository.create({ id, ...createBoard });
+    const board = this.boardsRepository.create(createBoard);
 
     return await this.boardsRepository.save(board);
   }
@@ -61,5 +50,9 @@ export class BoardsRepository {
       .createQueryBuilder('board')
       .where('board.address LIKE :keyword', { keyword: `%${keyword}%` })
       .getMany();
+  }
+
+  async deleteBoard(boardId: string) {
+    return await this.boardsRepository.delete({ id: boardId });
   }
 }

@@ -1,5 +1,7 @@
 export interface CreateBoard {
+  id: string;
   userId: string;
+  email: string;
   imagePath: string;
   title: string;
   description: string;

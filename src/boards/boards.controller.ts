@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -15,6 +16,7 @@ import { BoardsService } from './boards.service';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
+import { v4 } from 'uuid';
 
 @Controller('boards')
 export class BoardsController {
@@ -28,12 +30,16 @@ export class BoardsController {
     @Body() createBoardDto: CreateBoardDto,
     @Request() req,
   ) {
+    const id = v4();
     const userId = req.user.id;
-    const imagePath = await this.boardsService.uploadImage(file, userId);
+    const email = req.user.email;
+    const imagePath = await this.boardsService.uploadImage(file, userId, id);
     const board = await this.boardsService.createBoard({
-      ...createBoardDto,
+      id,
       userId,
+      email,
       imagePath,
+      ...createBoardDto,
     });
     return board;
   }
@@ -52,8 +58,31 @@ export class BoardsController {
     return await this.boardsService.searchAddress(keyword);
   }
 
+  @Get('/:id/owned')
+  @UseGuards(JwtAuthGuard)
+  async isOwnedBoard(@Param('id') id: string, @Request() req) {
+    console.log(id, req.user.id);
+
+    return await this.boardsService.isOwnedBoard(id, req.user.id);
+  }
+
   @Get('/:id')
   getBoardById(@Param('id') id: string) {
     return this.boardsService.getBoardById(id);
+  }
+
+  @Delete('/:id')
+  @UseGuards(JwtAuthGuard)
+  async deleteBoard(@Param('id') id: string, @Request() req) {
+    const isOwnedBoard = await this.boardsService.isOwnedBoard(id, req.user.id);
+    if (!isOwnedBoard) {
+      throw new Error('Not owned board');
+    }
+
+    const board = await this.boardsService.getBoardById(id);
+    if (board.data.imagePath) {
+      await this.boardsService.deleteS3Image(board.data.imagePath);
+    }
+    return await this.boardsService.deleteBoard(id, req.user.id);
   }
 }
