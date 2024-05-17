@@ -47,7 +47,9 @@ export class BoardsController {
 
   @Get()
   async getAllBoards(@Query('page') page = 1) {
-    if (page <= 0) throw new BadRequestException('Invalid page');
+    if (page <= 0) {
+      throw new BadRequestException('Invalid page');
+    }
 
     return await this.boardsService.getAllBoards({ page });
   }
@@ -61,7 +63,9 @@ export class BoardsController {
   @UseGuards(JwtAuthGuard)
   async isOwnedBoard(@Param('id') id: string, @Request() req) {
     const board = await this.boardsService.getBoardById(id);
-    if (board.data.userId !== req.user.id) return false;
+    if (board.data.userId !== req.user.id) {
+      return false;
+    }
 
     return true;
   }
@@ -76,11 +80,13 @@ export class BoardsController {
   async deleteBoard(@Param('id') id: string, @Request() req) {
     const board = await this.boardsService.getBoardById(id);
 
-    if (board.data.userId !== req.user.id)
+    if (board.data.userId !== req.user.id) {
       throw new ForbiddenException('Not owned board');
+    }
 
-    if (board.data.imagePath)
+    if (board.data.imagePath) {
       await this.boardsService.deleteS3Image(board.data.imagePath);
+    }
 
     return await this.boardsService.deleteBoard(id);
   }
