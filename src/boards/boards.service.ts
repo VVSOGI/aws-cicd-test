@@ -94,11 +94,6 @@ export class BoardsService {
     };
   }
 
-  async isOwnedBoard(boardId: string, userId: string) {
-    const board = await this.boardsRepository.getBoardById(boardId);
-    return board.userId === userId;
-  }
-
   async searchAddress(keyword: string) {
     const data = await this.boardsRepository.searchAddress(keyword);
     const boards = await Promise.all(
@@ -112,11 +107,7 @@ export class BoardsService {
     };
   }
 
-  async deleteBoard(boardId: string, userId: string) {
-    const isOwnedBoard = await this.isOwnedBoard(boardId, userId);
-    if (!isOwnedBoard) {
-      throw new Error('Not owned board');
-    }
+  async deleteBoard(boardId: string) {
     await this.boardsRepository.deleteBoard(boardId);
   }
 

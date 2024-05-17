@@ -82,6 +82,6 @@ export class BoardsController {
     if (board.data.imagePath)
       await this.boardsService.deleteS3Image(board.data.imagePath);
 
-    return await this.boardsService.deleteBoard(id, req.user.id);
+    return await this.boardsService.deleteBoard(id);
   }
 }
