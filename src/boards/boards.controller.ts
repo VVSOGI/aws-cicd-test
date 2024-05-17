@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   Param,
   Post,
@@ -46,9 +47,7 @@ export class BoardsController {
 
   @Get()
   async getAllBoards(@Query('page') page = 1) {
-    if (page <= 0) {
-      throw new BadRequestException('Invalid page');
-    }
+    if (page <= 0) throw new BadRequestException('Invalid page');
 
     return await this.boardsService.getAllBoards({ page });
   }
@@ -61,9 +60,10 @@ export class BoardsController {
   @Get('/:id/owned')
   @UseGuards(JwtAuthGuard)
   async isOwnedBoard(@Param('id') id: string, @Request() req) {
-    console.log(id, req.user.id);
+    const board = await this.boardsService.getBoardById(id);
+    if (board.data.userId !== req.user.id) return false;
 
-    return await this.boardsService.isOwnedBoard(id, req.user.id);
+    return true;
   }
 
   @Get('/:id')
@@ -74,15 +74,14 @@ export class BoardsController {
   @Delete('/:id')
   @UseGuards(JwtAuthGuard)
   async deleteBoard(@Param('id') id: string, @Request() req) {
-    const isOwnedBoard = await this.boardsService.isOwnedBoard(id, req.user.id);
-    if (!isOwnedBoard) {
-      throw new Error('Not owned board');
-    }
-
     const board = await this.boardsService.getBoardById(id);
-    if (board.data.imagePath) {
+
+    if (board.data.userId !== req.user.id)
+      throw new ForbiddenException('Not owned board');
+
+    if (board.data.imagePath)
       await this.boardsService.deleteS3Image(board.data.imagePath);
-    }
+
     return await this.boardsService.deleteBoard(id, req.user.id);
   }
 }

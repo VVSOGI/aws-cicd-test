@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Board } from './entities/boards.entity';
@@ -33,15 +33,18 @@ export class BoardsRepository {
 
   async getBoardById(id: string) {
     const board = await this.boardsRepository.findOneBy({ id });
-    if (board) {
-      const createdAtUtc = new Date(board.createdAt);
-      const updatedAtUtc = new Date(board.updatedAt);
 
-      const koreaTimeOffset = 9 * 60 * 60 * 1000;
-
-      board.createdAt = new Date(createdAtUtc.getTime() + koreaTimeOffset);
-      board.updatedAt = new Date(updatedAtUtc.getTime() + koreaTimeOffset);
+    if (!board) {
+      throw new NotFoundException('Board not found');
     }
+
+    const createdAtUtc = new Date(board.createdAt);
+    const updatedAtUtc = new Date(board.updatedAt);
+
+    const koreaTimeOffset = 9 * 60 * 60 * 1000;
+
+    board.createdAt = new Date(createdAtUtc.getTime() + koreaTimeOffset);
+    board.updatedAt = new Date(updatedAtUtc.getTime() + koreaTimeOffset);
     return board;
   }
 
