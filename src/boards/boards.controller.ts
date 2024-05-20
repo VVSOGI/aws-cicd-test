@@ -18,6 +18,7 @@ import { CreateBoardDto } from './dto/create-board.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { v4 } from 'uuid';
+import { UpdateBoardDto } from './dto/update-board.dto';
 
 @Controller('boards')
 export class BoardsController {
@@ -43,6 +44,45 @@ export class BoardsController {
       ...createBoardDto,
     });
     return board;
+  }
+
+  @Post('update')
+  @UseInterceptors(FileInterceptor('file'))
+  @UseGuards(JwtAuthGuard)
+  async updateBoard(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() updateBoardDto: UpdateBoardDto,
+    @Request() req,
+  ) {
+    const userId = req.user.id;
+    const email = req.user.email;
+    const board = await this.boardsService.getBoardById(updateBoardDto.id);
+
+    if (!file) {
+      const imagePath = board.data.imagePath;
+      return await this.boardsService.updateBoard({
+        userId,
+        email,
+        imagePath,
+        ...updateBoardDto,
+      });
+    }
+
+    const beforeImagePath = board.data.imagePath;
+    if (beforeImagePath) {
+      await this.boardsService.deleteS3Image(beforeImagePath);
+    }
+    const newImagePath = await this.boardsService.uploadImage(
+      file,
+      userId,
+      updateBoardDto.id,
+    );
+    await this.boardsService.updateBoard({
+      userId,
+      email,
+      imagePath: newImagePath,
+      ...updateBoardDto,
+    });
   }
 
   @Get()

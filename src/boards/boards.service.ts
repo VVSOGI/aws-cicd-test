@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Board } from './entities/boards.entity';
 import { BoardsRepository } from './boards.repository';
 import { AuthService } from 'src/auth/auth.service';
-import { CreateBoard, GetBoards } from './type/types';
+import { CreateBoard, GetBoards, UpdateBoard } from './type/types';
 import { s3 } from 'src/common/aws/s3';
 import { v4 } from 'uuid';
 
@@ -70,8 +70,22 @@ export class BoardsService {
       createBoard.activityTime = [createBoard.activityTime];
     }
 
-    this.boardsRepository.create({
+    await this.boardsRepository.create({
       ...createBoard,
+    });
+  }
+
+  async updateBoard(updateBoard: UpdateBoard) {
+    if (!Array.isArray(updateBoard.activityDate)) {
+      updateBoard.activityDate = [updateBoard.activityDate];
+    }
+
+    if (!Array.isArray(updateBoard.activityTime)) {
+      updateBoard.activityTime = [updateBoard.activityTime];
+    }
+
+    await this.boardsRepository.update({
+      ...updateBoard,
     });
   }
 
@@ -107,10 +121,6 @@ export class BoardsService {
     };
   }
 
-  async deleteBoard(boardId: string) {
-    await this.boardsRepository.deleteBoard(boardId);
-  }
-
   async deleteS3Image(imagePath: string) {
     const params = {
       Bucket: process.env.AWS_S3_BUCKET,
@@ -118,5 +128,9 @@ export class BoardsService {
     };
 
     await s3.deleteObject(params).promise();
+  }
+
+  async deleteBoard(boardId: string) {
+    await this.boardsRepository.deleteBoard(boardId);
   }
 }

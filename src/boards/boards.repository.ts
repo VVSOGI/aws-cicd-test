@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Board } from './entities/boards.entity';
-import { CreateBoard, GetBoards } from './type/types';
+import { CreateBoard, GetBoards, UpdateBoard } from './type/types';
 
 @Injectable()
 export class BoardsRepository {
@@ -14,6 +14,17 @@ export class BoardsRepository {
     const board = this.boardsRepository.create(createBoard);
 
     return await this.boardsRepository.save(board);
+  }
+
+  async update(updateBoard: UpdateBoard) {
+    const board = await this.boardsRepository.findOneBy({ id: updateBoard.id });
+
+    if (!board) {
+      throw new NotFoundException('Board not found');
+    }
+
+    const updatedBoard = { ...board, ...updateBoard };
+    return await this.boardsRepository.save(updatedBoard);
   }
 
   async getAllBoards({ page }: GetBoards) {
