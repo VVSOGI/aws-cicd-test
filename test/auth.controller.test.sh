@@ -1,8 +1,5 @@
 #!/bin/bash
 set -e
-cd "$(dirname "$0")"
-source ../.env
-source ./.config
 
 # login
 login() {
