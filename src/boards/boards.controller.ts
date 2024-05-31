@@ -118,6 +118,7 @@ export class BoardsController {
   @Delete('/:id')
   @UseGuards(JwtAuthGuard)
   async deleteBoard(@Param('id') id: string, @Request() req) {
+    console.log(id, req.user.id, '1204314-01294-012941-');
     const board = await this.boardsService.getBoardById(id);
 
     if (board.data.userId !== req.user.id) {
