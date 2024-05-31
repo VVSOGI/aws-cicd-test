@@ -7,7 +7,7 @@ login() {
   local password=$2
   local url=$3
 
-  local response=$(curl -X POST \
+  local response=$(curl -s -X POST \
     -H "Content-Type: application/json" \
     -d '{"email": "'"$email"'", "password": "'"$password"'"}' \
     "$url/auth/login")
