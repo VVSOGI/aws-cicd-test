@@ -15,11 +15,10 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { BoardsService } from './boards.service';
-import { CreateBoardDto } from './dto/create-board.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
+import { CreateBoardDto, UpdateBoardDto } from './dto';
 import { v4 } from 'uuid';
-import { UpdateBoardDto } from './dto/update-board.dto';
 
 @Controller('boards')
 export class BoardsController {
@@ -119,7 +118,6 @@ export class BoardsController {
   @Delete('/:id')
   @UseGuards(JwtAuthGuard)
   async deleteBoard(@Param('id') id: string, @Request() req) {
-    console.log(id, req.user.id, '1204314-01294-012941-');
     const board = await this.boardsService.getBoardById(id);
 
     if (board.data.userId !== req.user.id) {
