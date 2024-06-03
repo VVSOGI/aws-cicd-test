@@ -8,13 +8,15 @@ source ./utils.sh
 
 # findAll boards
 findAll() {
+    log "INFO" "Starting find all boards process"
     local url=$1
 
     local response=$(curl -X GET \
     -H "Content-Type: application/json" \
     "$url/boards")
 
-    echo "$response"
+    echo $response | jq '.'
+    log "INFO" "Find all boards process completed"
 }
 
 # search boards
@@ -125,4 +127,35 @@ createTest() {
     echo $searchResponse | jq '.'
 }
 
-createTest
+updateTest() {
+    log "INFO" "Starting update board process"
+    loginResponse=$(login $EMAIL $PASSWORD $URL)
+    accessToken=$(echo $loginResponse | jq -r '.accessToken')
+    createResponse=$(create $URL $accessToken)
+    statusCode=$(echo $createResponse | jq -r '.statusCode')
+
+    if (("$statusCode")); then
+        log "ERROR" "Create operation failed: $createResponse"
+        exit 1
+    fi
+
+    searchResponse=$(search $URL $ADDRESS)
+    echo $searchResponse | jq '.'
+    log "INFO" "update board started..."
+    boardId=$(echo $searchResponse | jq -r '.data[0].id')
+    updateResponse=$(update $URL $accessToken $boardId)
+
+    searchResponse=$(search $URL $ADDRESS)
+    echo $searchResponse | jq '.'
+
+    log "INFO" "Delete operation started..."
+    deleteResponse=$(delete $URL $accessToken $boardId)
+    log "INFO" "Delete operation successful"
+    searchResponse=$(search $URL $ADDRESS)
+
+    echo $searchResponse | jq '.'
+}
+
+# findAll $URL
+# createTest
+updateTest
