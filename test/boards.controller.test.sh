@@ -156,6 +156,6 @@ updateTest() {
     echo $searchResponse | jq '.'
 }
 
-# findAll $URL
-# createTest
+findAll $URL
+createTest
 updateTest
