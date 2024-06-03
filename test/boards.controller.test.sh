@@ -68,7 +68,7 @@ update() {
     local boardId=$3
 
     local curlCommand=(
-        curl -s -X POST "$url/boards/update"
+        curl -s -X PATCH "$url/boards"
         -H "Content-Type: multipart/form-data"
         -H "Authorization: Bearer $token"
         -F "id=$boardId"
@@ -156,6 +156,6 @@ updateTest() {
     echo $searchResponse | jq '.'
 }
 
-findAll $URL
-createTest
+# findAll $URL
+# createTest
 updateTest

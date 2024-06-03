@@ -6,6 +6,7 @@ import {
   ForbiddenException,
   Get,
   Param,
+  Patch,
   Post,
   Query,
   Request,
@@ -46,7 +47,7 @@ export class BoardsController {
     return board;
   }
 
-  @Post('update')
+  @Patch()
   @UseInterceptors(FileInterceptor('file'))
   @UseGuards(JwtAuthGuard)
   async updateBoard(
