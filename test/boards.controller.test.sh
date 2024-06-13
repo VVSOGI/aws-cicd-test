@@ -30,7 +30,7 @@ search() {
         -H "Content-Type: application/json" \
         "$url/boards/search?keyword=$SEARCH_KEYWORD_ENCODED")
     
-    echo "$response"
+    echo "$response" | jq '.'
 }
 
 # create board
@@ -107,6 +107,7 @@ delete() {
 createTest() {
     log "INFO" "Starting create board process"
     loginResponse=$(login $EMAIL $PASSWORD $URL)
+    echo $loginResponse
     accessToken=$(echo $loginResponse | jq -r '.accessToken')
     createResponse=$(create $URL $accessToken)
     statusCode=$(echo $createResponse | jq -r '.statusCode')
@@ -156,6 +157,4 @@ updateTest() {
     echo $searchResponse | jq '.'
 }
 
-# findAll $URL
-# createTest
-updateTest
+createTest
