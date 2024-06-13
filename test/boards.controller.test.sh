@@ -156,5 +156,3 @@ updateTest() {
 
     echo $searchResponse | jq '.'
 }
-
-createTest
