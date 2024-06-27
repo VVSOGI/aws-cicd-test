@@ -6,3 +6,4 @@ cd "$(dirname "$0")"
 login
 
 . ./boards.test.sh
+. ./auth.test.sh
