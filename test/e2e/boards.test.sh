@@ -2,8 +2,6 @@
 set -e
 . ./.config
 
-echo $ACCESS_TOKEN
-
 TITLE "게시물 생성"
 POST /boards \
     -H "Content-Type: multipart/form-data" \
