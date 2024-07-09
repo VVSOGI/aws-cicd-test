@@ -1,4 +1,4 @@
-# 티켓 구매 프로세스
+# 게시물 등록 프로세스
 
 ### 유스케이스 명: 게시물 등록 (Post boards)
 
@@ -56,3 +56,5 @@ Customer -> Frontend: 게시물 작성 페이지 입장 /boards/post
 Customer <- Frontend: 게시물 페이지 이동 /boards
 @enduml
 ```
+<img width="1061" alt="스크린샷 2024-07-09 오후 6 45 24" src="https://github.com/VVSOGI/sniff-step-nest/assets/76682009/f126748d-1c48-44a4-aadd-7a4ff5a91ed8">
+
