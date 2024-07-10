@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
+import { GetBoards, ServiceCreateBoard, UpdateBoard } from './type/types';
 import { Board } from './entities/boards.entity';
 import { BoardsRepository } from './boards.repository';
 import { AuthService } from 'src/auth/auth.service';
-import { GetBoards, ServiceCreateBoard, UpdateBoard } from './type/types';
+import { ArrayException } from 'src/common/utils/arrays';
 import { s3 } from 'src/common/aws/s3';
 import { v4 } from 'uuid';
 
@@ -62,14 +63,8 @@ export class BoardsService {
     const id = v4();
     const { userId, file } = createBoard;
     const imagePath = await this.uploadImage(file, userId, id);
-
-    if (!Array.isArray(createBoard.activityDate)) {
-      createBoard.activityDate = [createBoard.activityDate];
-    }
-
-    if (!Array.isArray(createBoard.activityTime)) {
-      createBoard.activityTime = [createBoard.activityTime];
-    }
+    createBoard.activityDate = ArrayException(createBoard.activityDate);
+    createBoard.activityTime = ArrayException(createBoard.activityTime);
 
     await this.boardsRepository.create({
       id,
@@ -79,13 +74,8 @@ export class BoardsService {
   }
 
   async updateBoard(updateBoard: UpdateBoard) {
-    if (!Array.isArray(updateBoard.activityDate)) {
-      updateBoard.activityDate = [updateBoard.activityDate];
-    }
-
-    if (!Array.isArray(updateBoard.activityTime)) {
-      updateBoard.activityTime = [updateBoard.activityTime];
-    }
+    updateBoard.activityDate = ArrayException(updateBoard.activityDate);
+    updateBoard.activityTime = ArrayException(updateBoard.activityTime);
 
     await this.boardsRepository.update({
       ...updateBoard,

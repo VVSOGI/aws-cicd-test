@@ -18,7 +18,6 @@ import { BoardsService } from './boards.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { CreateBoardDto, UpdateBoardDto } from './dto';
-import { v4 } from 'uuid';
 
 @Controller('boards')
 export class BoardsController {
