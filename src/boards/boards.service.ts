@@ -17,14 +17,6 @@ export class BoardsService {
     const profile = await this.authService.profile(board.userId);
     const imageUrl = `${process.env.AWS_CLOUD_FRONT_URL}${board.imagePath}`;
 
-    if (!board.imagePath) {
-      return {
-        ...board,
-        nickname: profile.nickname,
-        profileUrl: profile.profileImage,
-      };
-    }
-
     return {
       ...board,
       profileUrl: profile.profileImage,
@@ -48,7 +40,7 @@ export class BoardsService {
     userId: string,
     boardId: string,
   ): Promise<string> {
-    if (!file) return '';
+    if (!file) return 'default-image.png';
     const imageId = v4();
     const filenames = file.originalname.split('.');
     const extension = filenames[filenames.length - 1];
@@ -122,6 +114,8 @@ export class BoardsService {
   }
 
   async deleteS3Image(imagePath: string) {
+    if (imagePath === 'default-image.png') return;
+
     const params = {
       Bucket: process.env.AWS_S3_BUCKET,
       Key: imagePath,
