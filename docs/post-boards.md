@@ -39,15 +39,14 @@
 actor Customer
 Customer -> Frontend: 게시물 작성 페이지 입장 /boards/post
     Frontend -> Backend: 게시물 작성 시 필요한 데이터 전송 POST /boards
-        Backend -> Boards: uploadImage(file, userId, imageId)
-        group if imageFile not exist
-        Backend <-- Boards: 사전에 합의된 이미지 경로 반환
-        end
-            Boards -> AwsS3: uploadImageToS3(file, imagePath)
-        Backend <-- Boards: 이미지 경로 반환
         Backend -> Boards: createBoard({ id, userId, email, imagePath, ...createBoardDto })
+            group if imageFile not exist
+            Boards <-- AwsS3: 사전에 합의된 이미지 경로 반환
+            end
+            Boards -> AwsS3: uploadImageToS3(file, imagePath)
+            Boards <-- AwsS3: 이미지 경로 반환
             group if 산책 요일, 산책 시간이 배열로 들어오지 않을 경우
-            Boards -> DB: 산책 요일, 산책 시간을 배열로 변환
+            Boards -> DB: create({ ...createBoardData }) [산책 요일, 산책 시간을 배열로 변환]
             end
             Boards -> DB: create({ ...createBoardData })
             Boards <-- DB: true
@@ -56,5 +55,5 @@ Customer -> Frontend: 게시물 작성 페이지 입장 /boards/post
 Customer <- Frontend: 게시물 페이지 이동 /boards
 @enduml
 ```
-<img width="1061" alt="스크린샷 2024-07-09 오후 6 45 24" src="https://github.com/VVSOGI/sniff-step-nest/assets/76682009/f126748d-1c48-44a4-aadd-7a4ff5a91ed8">
 
+<img width="1061" alt="스크린샷 2024-07-09 오후 6 45 24" src="https://github.com/VVSOGI/sniff-step-nest/assets/76682009/f126748d-1c48-44a4-aadd-7a4ff5a91ed8">
