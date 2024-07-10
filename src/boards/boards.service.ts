@@ -30,18 +30,6 @@ export class BoardsService {
     };
   }
 
-  private async addEtcBoardData(board: Board) {
-    const profile = await this.authService.profile(board.userId);
-    const imageUrl = `${process.env.AWS_CLOUD_FRONT_URL}${board.imagePath}`;
-
-    return {
-      ...board,
-      profileUrl: profile.profileImage,
-      nickname: profile.nickname,
-      image: imageUrl,
-    };
-  }
-
   private async uploadImageToS3(imagePath: string, imageBuffer: Buffer) {
     const params = {
       Bucket: process.env.AWS_S3_BUCKET,
