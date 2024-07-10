@@ -32,15 +32,12 @@ export class BoardsController {
     @Body() createBoardDto: CreateBoardDto,
     @Request() req,
   ) {
-    const id = v4();
     const userId = req.user.id;
     const email = req.user.email;
-    const imagePath = await this.boardsService.uploadImage(file, userId, id);
     const board = await this.boardsService.createBoard({
-      id,
       userId,
       email,
-      imagePath,
+      file,
       ...createBoardDto,
     });
     return board;

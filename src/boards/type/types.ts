@@ -10,6 +10,17 @@ export interface CreateBoard {
   activityTime: string[];
 }
 
+export interface ServiceCreateBoard {
+  userId: string;
+  email: string;
+  title: string;
+  description: string;
+  address: string;
+  activityDate: string[];
+  activityTime: string[];
+  file: Express.Multer.File;
+}
+
 export interface UpdateBoard {
   id: string;
   userId: string;

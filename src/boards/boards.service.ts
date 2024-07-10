@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Board } from './entities/boards.entity';
 import { BoardsRepository } from './boards.repository';
 import { AuthService } from 'src/auth/auth.service';
-import { CreateBoard, GetBoards, UpdateBoard } from './type/types';
+import { GetBoards, ServiceCreateBoard, UpdateBoard } from './type/types';
 import { s3 } from 'src/common/aws/s3';
 import { v4 } from 'uuid';
 
@@ -58,7 +58,11 @@ export class BoardsService {
    * 프론트 측에서 element가 하나인 activityDate, activityTime를 보낼 때,
    * 문자열 타입으로 들어오는데 이를 프론트에서 해결할 수 없어서 서버에서 처리함
    * */
-  async createBoard(createBoard: CreateBoard) {
+  async createBoard(createBoard: ServiceCreateBoard) {
+    const id = v4();
+    const { userId, file } = createBoard;
+    const imagePath = await this.uploadImage(file, userId, id);
+
     if (!Array.isArray(createBoard.activityDate)) {
       createBoard.activityDate = [createBoard.activityDate];
     }
@@ -68,6 +72,8 @@ export class BoardsService {
     }
 
     await this.boardsRepository.create({
+      id,
+      imagePath,
       ...createBoard,
     });
   }
