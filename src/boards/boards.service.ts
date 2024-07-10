@@ -13,6 +13,23 @@ export class BoardsService {
     private authService: AuthService,
   ) {}
 
+  private async addUserProfile(board: Board) {
+    const profile = await this.authService.profile(board.userId);
+    return {
+      ...board,
+      profileUrl: profile.profileImage,
+      nickname: profile.nickname,
+    };
+  }
+
+  private async addURLtoImage(board: Board) {
+    const imageUrl = `${process.env.AWS_CLOUD_FRONT_URL}${board.imagePath}`;
+    return {
+      ...board,
+      image: imageUrl,
+    };
+  }
+
   private async addEtcBoardData(board: Board) {
     const profile = await this.authService.profile(board.userId);
     const imageUrl = `${process.env.AWS_CLOUD_FRONT_URL}${board.imagePath}`;
@@ -85,8 +102,9 @@ export class BoardsService {
     const { data, total } = await this.boardsRepository.getAllBoards(getBoards);
     const boards = await Promise.all(
       data.map(async (board) => {
-        const contents = await this.addEtcBoardData(board);
-        return contents;
+        const addURLtoImage = await this.addURLtoImage(board);
+        const addUserProfile = await this.addUserProfile(addURLtoImage);
+        return addUserProfile;
       }),
     );
     return { data: boards, total };
@@ -94,9 +112,10 @@ export class BoardsService {
 
   async getBoardById(id: string) {
     const findBoard = await this.boardsRepository.getBoardById(id);
-    const board = await this.addEtcBoardData(findBoard);
+    const addURLtoImage = await this.addURLtoImage(findBoard);
+    const addUserProfile = await this.addUserProfile(addURLtoImage);
     return {
-      data: board,
+      data: addUserProfile,
     };
   }
 
@@ -104,8 +123,9 @@ export class BoardsService {
     const data = await this.boardsRepository.searchAddress(keyword);
     const boards = await Promise.all(
       data.map(async (board) => {
-        const contents = await this.addEtcBoardData(board);
-        return contents;
+        const addURLtoImage = await this.addURLtoImage(board);
+        const addUserProfile = await this.addUserProfile(addURLtoImage);
+        return addUserProfile;
       }),
     );
     return {
