@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { GetBoards, ServiceCreateBoard, UpdateBoard } from './type/types';
+import {
+  GetBoards,
+  ServiceCreateBoard,
+  ServiceUpdateBoard,
+} from './type/types';
 import { Board } from './entities/boards.entity';
 import { BoardsRepository } from './boards.repository';
 import { AuthService } from 'src/auth/auth.service';
@@ -73,11 +77,27 @@ export class BoardsService {
     });
   }
 
-  async updateBoard(updateBoard: UpdateBoard) {
+  async updateBoard(updateBoard: ServiceUpdateBoard) {
+    const { userId, file } = updateBoard;
+    const findBoard = await this.getBoardById(updateBoard.id);
     updateBoard.activityDate = ArrayException(updateBoard.activityDate);
     updateBoard.activityTime = ArrayException(updateBoard.activityTime);
 
+    if (!file) {
+      return await this.boardsRepository.update({
+        userId: findBoard.data.userId,
+        email: findBoard.data.email,
+        imagePath: findBoard.data.imagePath,
+        ...updateBoard,
+      });
+    }
+
+    const beforeImagePath = findBoard.data.imagePath;
+    if (beforeImagePath) await this.deleteS3Image(beforeImagePath);
+    const newImagePath = await this.uploadImage(file, userId, updateBoard.id);
+
     await this.boardsRepository.update({
+      imagePath: newImagePath,
       ...updateBoard,
     });
   }
