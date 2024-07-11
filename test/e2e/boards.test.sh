@@ -28,10 +28,9 @@ GET /boards/$SELECTED_BOARD_ID \
     -H "Authorization: Bearer $ACCESS_TOKEN"
 
 TITLE "게시물 수정"
-PATCH /boards \
+PATCH /boards/$SELECTED_BOARD_ID \
     -H "Content-Type: multipart/form-data" \
     -H "Authorization: Bearer $ACCESS_TOKEN" \
-    -F "id=$SELECTED_BOARD_ID" \
     -F "title=$UPDATE_TITLE" \
     -F "description=$UPDATE_DESCRIPTION" \
     -F "address=$UPDATE_ADDRESS" \

@@ -42,17 +42,19 @@ export class BoardsController {
     return board;
   }
 
-  @Patch()
+  @Patch('/:boardId')
   @UseInterceptors(FileInterceptor('file'))
   @UseGuards(JwtAuthGuard)
   async updateBoard(
     @UploadedFile() file: Express.Multer.File,
     @Body() updateBoardDto: UpdateBoardDto,
+    @Param('boardId') boardId: string,
     @Request() req,
   ) {
     const userId = req.user.id;
     const email = req.user.email;
     await this.boardsService.updateBoard({
+      id: boardId,
       userId,
       email,
       file,
