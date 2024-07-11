@@ -52,31 +52,10 @@ export class BoardsController {
   ) {
     const userId = req.user.id;
     const email = req.user.email;
-    const board = await this.boardsService.getBoardById(updateBoardDto.id);
-
-    if (!file) {
-      const imagePath = board.data.imagePath;
-      return await this.boardsService.updateBoard({
-        userId,
-        email,
-        imagePath,
-        ...updateBoardDto,
-      });
-    }
-
-    const beforeImagePath = board.data.imagePath;
-    if (beforeImagePath) {
-      await this.boardsService.deleteS3Image(beforeImagePath);
-    }
-    const newImagePath = await this.boardsService.uploadImage(
-      file,
-      userId,
-      updateBoardDto.id,
-    );
     await this.boardsService.updateBoard({
       userId,
       email,
-      imagePath: newImagePath,
+      file,
       ...updateBoardDto,
     });
   }

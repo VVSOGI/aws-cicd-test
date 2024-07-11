@@ -33,6 +33,18 @@ export interface UpdateBoard {
   activityTime: string[];
 }
 
+export interface ServiceUpdateBoard {
+  id: string;
+  userId: string;
+  email: string;
+  title: string;
+  description: string;
+  address: string;
+  activityDate: string[];
+  activityTime: string[];
+  file: Express.Multer.File;
+}
+
 export interface GetBoards {
   page: number;
 }

@@ -49,13 +49,6 @@ export class BoardsRepository {
       throw new NotFoundException('Board not found');
     }
 
-    const createdAtUtc = new Date(board.createdAt);
-    const updatedAtUtc = new Date(board.updatedAt);
-
-    const koreaTimeOffset = 9 * 60 * 60 * 1000;
-
-    board.createdAt = new Date(createdAtUtc.getTime() + koreaTimeOffset);
-    board.updatedAt = new Date(updatedAtUtc.getTime() + koreaTimeOffset);
     return board;
   }
 
