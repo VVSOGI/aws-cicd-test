@@ -8,6 +8,7 @@ import { UserModule } from './users/users.module';
 import { BoardsModule } from './boards/boards.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { Config, isDevelopment } from './config';
+import { LoggerModule } from './global/logger.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { Config, isDevelopment } from './config';
     AuthModule,
     UserModule,
     BoardsModule,
+    LoggerModule,
   ],
   controllers: [AppController],
   providers: [AppService],

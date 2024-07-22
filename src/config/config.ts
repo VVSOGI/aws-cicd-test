@@ -21,4 +21,10 @@ export const Config = {
     password: getString('DB_PASSWORD'),
     database: getString('DB_DATABASE'),
   },
+  log: {
+    logDirectory: getString('LOG_DIRECTORY'),
+    daysToKeepLogs: getString('LOG_DAYS_TO_KEEP'),
+    fileLogLevel: getString('LOG_FILE_LEVEL'),
+    consoleLogLevel: getString('LOG_CONSOLE_LEVEL'),
+  },
 };
