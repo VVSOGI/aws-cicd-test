@@ -9,7 +9,7 @@ import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
 @Injectable()
-export class HttpSuccessInterceptor implements NestInterceptor {
+export class HttpInterceptor implements NestInterceptor {
   async intercept(
     context: ExecutionContext,
     next: CallHandler,
@@ -18,7 +18,6 @@ export class HttpSuccessInterceptor implements NestInterceptor {
 
     const request = context.switchToHttp().getRequest();
     const response = context.switchToHttp().getResponse();
-
     return next.handle().pipe(
       tap({
         complete: () => {
@@ -30,6 +29,17 @@ export class HttpSuccessInterceptor implements NestInterceptor {
           };
 
           Logger.verbose('SUCCESS', 'HTTP', additionalInfo);
+        },
+        error: (error) => {
+          const additionalInfo = {
+            statusCode: response.statusCode,
+            method: request.method,
+            url: request.url,
+            body: request.body,
+            runningTime: `${Date.now() - now}ms`,
+          };
+
+          Logger.warn(error.message, error.stack, additionalInfo);
         },
       }),
     );

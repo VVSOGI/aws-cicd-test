@@ -1,1 +1,1 @@
-export * from './http-success.interceptor';
+export * from './http.interceptor';
