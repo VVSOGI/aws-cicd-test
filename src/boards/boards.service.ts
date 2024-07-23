@@ -35,12 +35,6 @@ export class BoardsService {
     };
   }
 
-  async addAddtionalData(board: Board) {
-    const addURLtoImage = await this.addURLtoImage(board);
-    const addUserProfile = await this.addUserProfile(addURLtoImage);
-    return addUserProfile;
-  }
-
   private async uploadImageToS3(imagePath: string, imageBuffer: Buffer) {
     const params = {
       Bucket: process.env.AWS_S3_BUCKET,
@@ -49,6 +43,12 @@ export class BoardsService {
     };
 
     await s3.upload(params).promise();
+  }
+
+  async addAddtionalData(board: Board) {
+    const addURLtoImage = await this.addURLtoImage(board);
+    const addUserProfile = await this.addUserProfile(addURLtoImage);
+    return addUserProfile;
   }
 
   async uploadImage(
@@ -86,16 +86,15 @@ export class BoardsService {
   async updateBoard(updateBoard: ServiceUpdateBoard) {
     const { userId, file } = updateBoard;
     const findBoard = await this.getBoardById(updateBoard.id);
-    const addURLtoImage = await this.addURLtoImage(findBoard);
-    const addUserProfile = await this.addUserProfile(addURLtoImage);
+    const addtionalBoard = await this.addAddtionalData(findBoard);
     updateBoard.activityDate = ArrayException(updateBoard.activityDate);
     updateBoard.activityTime = ArrayException(updateBoard.activityTime);
 
     if (!file) {
       return await this.boardsRepository.update({
-        userId: addUserProfile.userId,
-        email: addUserProfile.email,
-        imagePath: addUserProfile.imagePath,
+        userId: addtionalBoard.userId,
+        email: addtionalBoard.email,
+        imagePath: addtionalBoard.imagePath,
         ...updateBoard,
       });
     }
@@ -114,9 +113,8 @@ export class BoardsService {
     const { data, total } = await this.boardsRepository.getAllBoards(getBoards);
     const boards = await Promise.all(
       data.map(async (board) => {
-        const addURLtoImage = await this.addURLtoImage(board);
-        const addUserProfile = await this.addUserProfile(addURLtoImage);
-        return addUserProfile;
+        const addtionalBoard = await this.addAddtionalData(board);
+        return addtionalBoard;
       }),
     );
     return { data: boards, total };
@@ -131,9 +129,8 @@ export class BoardsService {
     const data = await this.boardsRepository.searchAddress(keyword);
     const boards = await Promise.all(
       data.map(async (board) => {
-        const addURLtoImage = await this.addURLtoImage(board);
-        const addUserProfile = await this.addUserProfile(addURLtoImage);
-        return addUserProfile;
+        const addtionalBoard = await this.addAddtionalData(board);
+        return addtionalBoard;
       }),
     );
     return {

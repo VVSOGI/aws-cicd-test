@@ -86,6 +86,7 @@ export class BoardsController {
   }
 
   @Delete('/:id')
+  @UseGuards(BoardExistsGuard)
   @UseGuards(JwtAuthGuard)
   async deleteBoard(@Param('id') id: string, @Request() req) {
     const board = await this.boardsService.getBoardById(id);
