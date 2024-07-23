@@ -45,13 +45,7 @@ export class BoardsService {
     await s3.upload(params).promise();
   }
 
-  async addAddtionalData(board: Board) {
-    const addURLtoImage = await this.addURLtoImage(board);
-    const addUserProfile = await this.addUserProfile(addURLtoImage);
-    return addUserProfile;
-  }
-
-  async uploadImage(
+  private async uploadImage(
     file: Express.Multer.File,
     userId: string,
     boardId: string,
@@ -63,6 +57,12 @@ export class BoardsService {
     const imagePath = `uploads/${userId}/${boardId}/${imageId}.${extension}`;
     await this.uploadImageToS3(imagePath, file.buffer);
     return imagePath;
+  }
+
+  async addAddtionalData(board: Board) {
+    const addURLtoImage = await this.addURLtoImage(board);
+    const addUserProfile = await this.addUserProfile(addURLtoImage);
+    return addUserProfile;
   }
 
   /**
@@ -80,32 +80,6 @@ export class BoardsService {
       id,
       imagePath,
       ...createBoard,
-    });
-  }
-
-  async updateBoard(updateBoard: ServiceUpdateBoard) {
-    const { userId, file } = updateBoard;
-    const findBoard = await this.getBoardById(updateBoard.id);
-    const addtionalBoard = await this.addAddtionalData(findBoard);
-    updateBoard.activityDate = ArrayException(updateBoard.activityDate);
-    updateBoard.activityTime = ArrayException(updateBoard.activityTime);
-
-    if (!file) {
-      return await this.boardsRepository.update({
-        userId: addtionalBoard.userId,
-        email: addtionalBoard.email,
-        imagePath: addtionalBoard.imagePath,
-        ...updateBoard,
-      });
-    }
-
-    const beforeImagePath = findBoard.imagePath;
-    if (beforeImagePath) await this.deleteS3Image(beforeImagePath);
-    const newImagePath = await this.uploadImage(file, userId, updateBoard.id);
-
-    await this.boardsRepository.update({
-      imagePath: newImagePath,
-      ...updateBoard,
     });
   }
 
@@ -136,6 +110,32 @@ export class BoardsService {
     return {
       data: boards,
     };
+  }
+
+  async updateBoard(updateBoard: ServiceUpdateBoard) {
+    const { userId, file } = updateBoard;
+    const findBoard = await this.getBoardById(updateBoard.id);
+    const addtionalBoard = await this.addAddtionalData(findBoard);
+    updateBoard.activityDate = ArrayException(updateBoard.activityDate);
+    updateBoard.activityTime = ArrayException(updateBoard.activityTime);
+
+    if (!file) {
+      return await this.boardsRepository.update({
+        userId: addtionalBoard.userId,
+        email: addtionalBoard.email,
+        imagePath: addtionalBoard.imagePath,
+        ...updateBoard,
+      });
+    }
+
+    const beforeImagePath = findBoard.imagePath;
+    if (beforeImagePath) await this.deleteS3Image(beforeImagePath);
+    const newImagePath = await this.uploadImage(file, userId, updateBoard.id);
+
+    await this.boardsRepository.update({
+      imagePath: newImagePath,
+      ...updateBoard,
+    });
   }
 
   async deleteS3Image(imagePath: string) {
