@@ -35,6 +35,12 @@ export class BoardsService {
     };
   }
 
+  async addAddtionalData(board: Board) {
+    const addURLtoImage = await this.addURLtoImage(board);
+    const addUserProfile = await this.addUserProfile(addURLtoImage);
+    return addUserProfile;
+  }
+
   private async uploadImageToS3(imagePath: string, imageBuffer: Buffer) {
     const params = {
       Bucket: process.env.AWS_S3_BUCKET,
@@ -80,19 +86,21 @@ export class BoardsService {
   async updateBoard(updateBoard: ServiceUpdateBoard) {
     const { userId, file } = updateBoard;
     const findBoard = await this.getBoardById(updateBoard.id);
+    const addURLtoImage = await this.addURLtoImage(findBoard);
+    const addUserProfile = await this.addUserProfile(addURLtoImage);
     updateBoard.activityDate = ArrayException(updateBoard.activityDate);
     updateBoard.activityTime = ArrayException(updateBoard.activityTime);
 
     if (!file) {
       return await this.boardsRepository.update({
-        userId: findBoard.data.userId,
-        email: findBoard.data.email,
-        imagePath: findBoard.data.imagePath,
+        userId: addUserProfile.userId,
+        email: addUserProfile.email,
+        imagePath: addUserProfile.imagePath,
         ...updateBoard,
       });
     }
 
-    const beforeImagePath = findBoard.data.imagePath;
+    const beforeImagePath = findBoard.imagePath;
     if (beforeImagePath) await this.deleteS3Image(beforeImagePath);
     const newImagePath = await this.uploadImage(file, userId, updateBoard.id);
 
@@ -116,11 +124,7 @@ export class BoardsService {
 
   async getBoardById(id: string) {
     const findBoard = await this.boardsRepository.getBoardById(id);
-    const addURLtoImage = await this.addURLtoImage(findBoard);
-    const addUserProfile = await this.addUserProfile(addURLtoImage);
-    return {
-      data: addUserProfile,
-    };
+    return findBoard;
   }
 
   async searchAddress(keyword: string) {

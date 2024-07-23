@@ -18,6 +18,7 @@ import { BoardsService } from './boards.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { CreateBoardDto, UpdateBoardDto } from './dto';
+import { BoardExistsGuard } from './guards/board-exists.guard';
 
 @Controller('boards')
 export class BoardsController {
@@ -76,20 +77,12 @@ export class BoardsController {
     return await this.boardsService.searchAddress(keyword);
   }
 
-  @Get('/:id/owned')
-  @UseGuards(JwtAuthGuard)
-  async isOwnedBoard(@Param('id') id: string, @Request() req) {
-    const board = await this.boardsService.getBoardById(id);
-    if (board.data.userId !== req.user.id) {
-      return false;
-    }
-
-    return true;
-  }
-
   @Get('/:id')
-  getBoardById(@Param('id') id: string) {
-    return this.boardsService.getBoardById(id);
+  @UseGuards(BoardExistsGuard)
+  async getBoardById(@Param('id') id: string) {
+    const board = await this.boardsService.getBoardById(id);
+    const addtionalBoard = await this.boardsService.addAddtionalData(board);
+    return addtionalBoard;
   }
 
   @Delete('/:id')
@@ -97,12 +90,12 @@ export class BoardsController {
   async deleteBoard(@Param('id') id: string, @Request() req) {
     const board = await this.boardsService.getBoardById(id);
 
-    if (board.data.userId !== req.user.id) {
+    if (board.userId !== req.user.id) {
       throw new ForbiddenException('Not owned board');
     }
 
-    if (board.data.imagePath) {
-      await this.boardsService.deleteS3Image(board.data.imagePath);
+    if (board.imagePath) {
+      await this.boardsService.deleteS3Image(board.imagePath);
     }
 
     return await this.boardsService.deleteBoard(id);

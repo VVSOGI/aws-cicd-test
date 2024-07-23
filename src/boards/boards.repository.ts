@@ -45,10 +45,6 @@ export class BoardsRepository {
   async getBoardById(id: string) {
     const board = await this.boardsRepository.findOneBy({ id });
 
-    if (!board) {
-      throw new NotFoundException('Board not found');
-    }
-
     return board;
   }
 
