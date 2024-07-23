@@ -48,16 +48,3 @@ TITLE "게시물 삭제"
 DELETE /boards/$SELECTED_BOARD_ID \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $ACCESS_TOKEN"
-
-TITLE "게시물 삭제 확인"
-GET /boards \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer $ACCESS_TOKEN"
-
-DELETE_BOARD=$(echo $BODY | jq -r '.data[] | select(.id == "'$SELECTED_BOARD_ID'")')
-
-if [[ -z "$DELETE_BOARD" ]]; then
-    echo "게시물 삭제 성공"
-else
-    echo "게시물 삭제 실패"
-fi
