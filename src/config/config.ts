@@ -27,4 +27,8 @@ export const Config = {
     fileLogLevel: getString('LOG_FILE_LEVEL'),
     consoleLogLevel: getString('LOG_CONSOLE_LEVEL'),
   },
+  redis: {
+    host: getString('REDIS_HOST'),
+    port: getNumber('REDIS_PORT'),
+  },
 };
