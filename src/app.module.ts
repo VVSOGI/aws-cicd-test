@@ -9,7 +9,7 @@ import { BoardsModule } from './boards/boards.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { Config, isDevelopment } from './config';
 import { LoggerModule } from './global/logger.module';
-import { RedisModule } from './redis/redis.module';
+import { CacheModule } from './cache/cache.module';
 
 @Module({
   imports: [
@@ -37,7 +37,7 @@ import { RedisModule } from './redis/redis.module';
     UserModule,
     BoardsModule,
     LoggerModule,
-    RedisModule,
+    CacheModule,
   ],
   controllers: [AppController],
   providers: [AppService],
