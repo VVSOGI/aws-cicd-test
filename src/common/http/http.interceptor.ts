@@ -32,7 +32,7 @@ export class HttpInterceptor implements NestInterceptor {
         },
         error: (error) => {
           const additionalInfo = {
-            statusCode: response.statusCode,
+            statusCode: error.response.statusCode,
             method: request.method,
             url: request.url,
             body: request.body,

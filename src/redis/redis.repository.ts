@@ -15,6 +15,6 @@ export class RedisRepository {
   }
 
   async set(key: string, value: string) {
-    return this.redisClient.set(key, value);
+    return this.redisClient.setex(key, 10, value);
   }
 }
