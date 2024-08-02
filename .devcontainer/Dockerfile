@@ -1,4 +1,4 @@
-FROM node:lts-bullseye
+FROM node:20.12.0
 
 RUN apt-get update
 
