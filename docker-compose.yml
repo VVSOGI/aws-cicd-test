@@ -20,7 +20,7 @@ services:
       - all
     container_name: ${DB_CONTAINER_NAME}
     environment:
-      POSTGRES_PASSWORD: ${DB_PASSWORD} # 실제 사용 시 안전한 비밀번호로 변경하세요
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     expose:
       - '${DB_PORT}'
     volumes:
