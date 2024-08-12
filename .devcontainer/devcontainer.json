@@ -16,8 +16,15 @@
     "NODE_ENV": "development"
   },
   "initializeCommand": "docker network create sniff-step || true",
-  "runArgs": ["--network", "sniff-step"],
-  "forwardPorts": ["postgres:5432"],
+  "runArgs": [
+    "--network",
+    "sniff-step",
+    "--name",
+    "${containerWorkspaceFolderBasename}-vscode"
+  ],
+  "forwardPorts": [
+    "postgres:5432"
+  ],
   "customizations": {
     "vscode": {
       "extensions": [
