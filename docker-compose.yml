@@ -5,6 +5,7 @@ services:
     image: redis
     profiles:
       - infra
+      - all
     container_name: ${REDIS_HOST}
     expose:
       - '${REDIS_PORT}'
@@ -16,6 +17,7 @@ services:
     image: postgres
     profiles:
       - infra
+      - all
     container_name: ${DB_CONTAINER_NAME}
     environment:
       POSTGRES_PASSWORD: ${DB_PASSWORD} # 실제 사용 시 안전한 비밀번호로 변경하세요
@@ -32,6 +34,7 @@ services:
     build: .
     profiles:
       - service
+      - all
     container_name: ${SERVICE_BACKEND_CONTAINER_NAME}
     env_file:
       - .env
