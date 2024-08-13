@@ -16,4 +16,5 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
-            touch test.txt
+            cd ~/sniff-step-nest
+            git pull
