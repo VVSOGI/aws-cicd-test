@@ -20,7 +20,9 @@ services:
       - all
     container_name: ${DB_CONTAINER_NAME}
     environment:
+      POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
     expose:
       - '${DB_PORT}'
     volumes:
