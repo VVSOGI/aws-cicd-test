@@ -1,4 +1,4 @@
-name: Deploy with Docker Compose
+name: Auto Deploy
 
 on:
   push:
@@ -8,7 +8,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy to server
+      - name: Auto Deploy
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -16,5 +16,12 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
+            set -e
+            echo "Starting deployment process..."
+
             cd ~/sniff-step-nest
-            git pull
+            git pull origin main
+            docker-compose --profile service build
+            docker-compose --profile service down
+            docker-compose --profile service up -d
+            echo "Deployment completed successfully!"
