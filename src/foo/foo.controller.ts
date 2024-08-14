@@ -4,6 +4,6 @@ import { Controller, Get } from '@nestjs/common';
 export class FooController {
   @Get()
   getFoo(): string {
-    return 'John Doe Test Auto Deploy';
+    return 'John Doe Test Auto Deploy 2';
   }
 }
