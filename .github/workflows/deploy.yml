@@ -31,3 +31,5 @@ jobs:
             docker-compose --profile services up -d
 
             echo "Deployment completed successfully!"
+
+            docker exec -i nginx nginx -s reload
