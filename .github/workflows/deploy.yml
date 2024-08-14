@@ -22,6 +22,12 @@ jobs:
             cd ~/sniff-step-nest
             git pull origin main
             docker-compose --profile services build
-            docker-compose --profile services down
+
+            echo "Stopping and removing backend service..."
+            docker-compose stop backend
+            docker-compose rm -f backend
+
+            echo "Starting backend service..."
             docker-compose --profile services up -d
+
             echo "Deployment completed successfully!"
