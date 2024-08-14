@@ -35,7 +35,7 @@ services:
     image: ${SERVICE_BACKEND_CONTAINER_NAME}
     build: .
     profiles:
-      - service
+      - services
       - all
     container_name: ${SERVICE_BACKEND_CONTAINER_NAME}
     env_file:

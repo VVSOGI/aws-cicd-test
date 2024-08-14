@@ -21,7 +21,7 @@ jobs:
 
             cd ~/sniff-step-nest
             git pull origin main
-            docker-compose --profile service build
-            docker-compose --profile service down
-            docker-compose --profile service up -d
+            docker-compose --profile services build
+            docker-compose --profile services down
+            docker-compose --profile services up -d
             echo "Deployment completed successfully!"
