@@ -8,7 +8,6 @@ import { MulterModule } from '@nestjs/platform-express';
 import { Config, isDevelopment } from './config';
 import { LoggerModule } from './global/logger.module';
 import { CacheModule } from './cache/cache.module';
-import { FooModule } from './foo/foo.module';
 
 @Module({
   imports: [
@@ -37,7 +36,6 @@ import { FooModule } from './foo/foo.module';
     BoardsModule,
     LoggerModule,
     CacheModule,
-    FooModule,
   ],
 })
 export class AppModule {}
